@@ -1,0 +1,84 @@
+LEX Program (typecheck.l)
+%{
+#include "y.tab.h"
+%}
+
+%%
+"int"       { return INT; }
+"float"     { return FLOAT; }
+[a-zA-Z]+   { return ID; }
+[=;]        { return yytext[0]; }
+[ \t\n]+    ;    /* ignore spaces */
+.            { return yytext[0]; }
+%%
+
+🧩 YACC Program (typecheck.y)
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+int type;  // 1=int, 2=float
+%}
+
+%token INT FLOAT ID
+
+%%
+S : TYPE ID '=' TYPE ';' {
+        if ($1 == $4)
+            printf("Type checking successful: valid assignment\n");
+        else
+            printf("Type error: incompatible types\n");
+    }
+  ;
+
+TYPE : INT     { $$ = 1; }
+     | FLOAT   { $$ = 2; }
+     ;
+%%
+
+int main() {
+    printf("Enter a statement (e.g., int a = int; or int a = float;):\n");
+    yyparse();
+    return 0;
+}
+
+int yyerror(char *msg) {
+    printf("Invalid statement.\n");
+    return 0;
+}
+
+⚙️ Steps to Execute
+
+Save as:
+
+typecheck.l
+
+typecheck.y
+
+Run the commands:
+
+yacc -d typecheck.y
+lex typecheck.l
+gcc y.tab.c lex.yy.c -o typecheck
+./typecheck
+
+🧾 Sample Input / Output
+
+Input 1:
+
+int a = int;
+
+
+Output:
+
+Type checking successful: valid assignment
+
+
+Input 2:
+
+int a = float;
+
+
+Output:
+
+Type error: incompatible types
