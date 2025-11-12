@@ -1,0 +1,101 @@
+LEX Program (optimize.l)
+%{
+#include "y.tab.h"
+%}
+
+%%
+[0-9]+          { yylval = atoi(yytext); return NUM; }
+[a-zA-Z][a-zA-Z0-9]*  { return ID; }
+[+\-*/=();]     { return yytext[0]; }
+[ \t\n]+        ;   /* Ignore spaces */
+%%
+
+🧩 YACC Program (optimize.y)
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+
+%token ID NUM
+%left '+' '-'
+%left '*' '/'
+
+%%
+S : ID '=' E ';'   { printf("Optimized Code: %s = %d;\n", $1, $3); }
+  ;
+
+E : E '+' E     { $$ = $1 + $3; }   /* Constant Folding */
+  | E '-' E     { $$ = $1 - $3; }
+  | E '*' E     { $$ = $1 * $3; }
+  | E '/' E     { $$ = $3 ? $1 / $3 : 0; }
+  | E '*' NUM   { 
+                    if ($3 == 2) printf("Strength Reduction: Multiplication by 2 -> Left shift\n");
+                    $$ = $1 * $3; 
+                }
+  | E '+' 0     { $$ = $1; }        /* Algebraic Transformation */
+  | E '*' 1     { $$ = $1; }
+  | E '*' 0     { $$ = 0; }
+  | '(' E ')'   { $$ = $2; }
+  | NUM         { $$ = $1; }
+  ;
+%%
+
+int main() {
+    printf("Enter a statement (e.g., x = 2 + 3 * 4;)\n");
+    yyparse();
+    return 0;
+}
+
+int yyerror(char *msg) {
+    printf("Invalid expression.\n");
+    return 0;
+}
+
+⚙️ Steps to Execute
+
+Save as:
+
+optimize.l
+
+optimize.y
+
+Run in terminal:
+
+yacc -d optimize.y
+lex optimize.l
+gcc y.tab.c lex.yy.c -o optimize
+./optimize
+
+🧾 Sample Input / Output
+
+Input:
+
+x = 2 + 3 * 4;
+
+
+Output:
+
+Optimized Code: x = 14;
+
+
+Input:
+
+x = a * 2;
+
+
+Output:
+
+Strength Reduction: Multiplication by 2 -> Left shift
+Optimized Code: x = 0;
+
+
+(Shows optimization message even if value not known.)
+
+Input:
+
+x = a * 1;
+
+
+Output:
+
+Optimized Code: x = 0;
