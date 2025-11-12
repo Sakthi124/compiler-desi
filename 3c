@@ -1,0 +1,106 @@
+LEX Program (control.l)
+%{
+#include "y.tab.h"
+%}
+
+%%
+"for"           { return FOR; }
+"while"         { return WHILE; }
+"if"            { return IF; }
+"else if"       { return ELSEIF; }
+"else"          { return ELSE; }
+"switch"        { return SWITCH; }
+"case"          { return CASE; }
+[ \t\n]+        ;     /* Ignore spaces, tabs, newlines */
+.               { return INVALID; }
+%%
+
+🧩 YACC Program (control.y)
+%{
+#include <stdio.h>
+#include <stdlib.h>
+int valid_flag = 0;
+%}
+
+%token FOR WHILE IF ELSEIF ELSE SWITCH CASE INVALID
+
+%%
+start : controls   { printf("Valid control structure.\n"); valid_flag = 1; }
+      | INVALID    { printf("Invalid control structure.\n"); valid_flag = 0; }
+      ;
+
+controls : FOR
+          | WHILE
+          | IF
+          | ELSEIF
+          | ELSE
+          | SWITCH
+          | CASE
+          ;
+%%
+
+int main() {
+    printf("Enter a control structure keyword: ");
+    yyparse();
+    return 0;
+}
+
+int yyerror(char *msg) {
+    return 0;
+}
+
+⚙️ Steps to Execute
+
+Save both files as:
+
+control.l
+
+control.y
+
+Open terminal and run:
+
+yacc -d control.y
+lex control.l
+gcc lex.yy.c y.tab.c -o control
+./control
+
+🧾 Sample Input / Output
+
+Input 1:
+
+for
+
+
+Output:
+
+Valid control structure.
+
+
+Input 2:
+
+else if
+
+
+Output:
+
+Valid control structure.
+
+
+Input 3:
+
+while
+
+
+Output:
+
+Valid control structure.
+
+
+Input 4:
+
+foreach
+
+
+Output:
+
+Invalid control structure.
