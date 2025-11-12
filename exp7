@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char op[5], arg1[10], arg2[10], result[10];
+
+    printf("Enter Three Address Code (TAC) in the format:\n");
+    printf("result = arg1 op arg2\n");
+    printf("(Type 'exit' to stop)\n\n");
+
+    while (1) {
+        printf("TAC: ");
+        scanf("%s", result);
+        if (strcmp(result, "exit") == 0)
+            break;
+
+        scanf("%s %s %s", op, arg1, arg2);
+
+        // Remove '=' sign from op if needed
+        if (strcmp(op, "=") == 0) {
+            strcpy(op, arg1);
+            strcpy(arg1, arg2);
+        }
+
+        printf("\nGenerated 8086 Assembly Code:\n");
+
+        if (strcmp(op, "+") == 0) {
+            printf("MOV AX, %s\n", arg1);
+            printf("ADD AX, %s\n", arg2);
+            printf("MOV %s, AX\n", result);
+        } else if (strcmp(op, "-") == 0) {
+            printf("MOV AX, %s\n", arg1);
+            printf("SUB AX, %s\n", arg2);
+            printf("MOV %s, AX\n", result);
+        } else if (strcmp(op, "*") == 0) {
+            printf("MOV AX, %s\n", arg1);
+            printf("MUL %s\n", arg2);
+            printf("MOV %s, AX\n", result);
+        } else if (strcmp(op, "/") == 0) {
+            printf("MOV AX, %s\n", arg1);
+            printf("DIV %s\n", arg2);
+            printf("MOV %s, AX\n", result);
+        } else {
+            printf("Unsupported operation!\n");
+        }
+        printf("-----------------------------\n");
+    }
+
+    return 0;
+}
+Steps to Execute
+
+Save file as backend.c
+
+Compile and run:
+
+gcc backend.c -o backend
+./backend
+
+🧾 Sample Input / Output
+
+Input:
+
+TAC: t1 = a + b
+TAC: t2 = t1 * c
+TAC: x = t2
+TAC: exit
+
+
+Output:
+
+Generated 8086 Assembly Code:
+MOV AX, a
+ADD AX, b
+MOV t1, AX
+-----------------------------
+Generated 8086 Assembly Code:
+MOV AX, t1
+MUL c
+MOV t2, AX
+-----------------------------
+Generated 8086 Assembly Code:
+MOV AX, t2
+MOV x, AX
+-----------------------------
