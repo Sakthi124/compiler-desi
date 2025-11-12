@@ -1,0 +1,78 @@
+%{
+#include "y.tab.h"
+%}
+
+%%
+[a-zA-Z][a-zA-Z0-9]*    { return VALID; }
+.|\n                    { return INVALID; }
+%%
+YACC Program (var.y)
+%{
+#include <stdio.h>
+#include <stdlib.h>
+int valid_flag = 0;
+%}
+
+%token VALID INVALID
+
+%%
+start : VALID     { printf("Valid variable name.\n"); valid_flag = 1; }
+      | INVALID   { printf("Invalid variable name.\n"); valid_flag = 0; }
+      ;
+%%
+
+int main() {
+    printf("Enter a variable name: ");
+    yyparse();
+    return 0;
+}
+
+int yyerror(char *msg) {
+    return 0;
+}
+
+⚙️ Steps to Run
+
+Save both files as:
+
+var.l
+
+var.y
+
+In terminal, execute:
+
+yacc -d var.y
+lex var.l
+gcc lex.yy.c y.tab.c -o var
+./var
+
+🧾 Sample Input / Output
+
+Input 1:
+
+abc123
+
+
+Output:
+
+Valid variable name.
+
+
+Input 2:
+
+1abc
+
+
+Output:
+
+Invalid variable name.
+
+
+Input 3:
+
+A9b2
+
+
+Output:
+
+Valid variable name.
